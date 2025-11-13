@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Night Ride Fuel Finder</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+        crossorigin=""
+    >
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="page">
+        <header class="hero">
+            <div class="hero__content">
+                <h1>Night Ride Fuel Finder</h1>
+                <p>Подберите ночной маршрут к круглосуточной АЗС в нужном вам радиусе.</p>
+            </div>
+        </header>
+
+        <main class="layout">
+            <section class="panel">
+                <form id="ride-form" class="form" method="post" novalidate>
+                    <h2>Параметры поездки</h2>
+
+                    {% if error %}
+                        <div class="alert alert--error">{{ error }}</div>
+                    {% endif %}
+
+                    {% if tolerance_hint %}
+                        <div class="alert alert--info">{{ tolerance_hint }}</div>
+                    {% endif %}
+
+                    <label class="field">
+                        <span class="field__label">Город отправления<span class="field__required">*</span></span>
+                        <input
+                            class="field__input"
+                            type="text"
+                            name="city"
+                            value="{{ city }}"
+                            placeholder="Например, Moscow"
+                            required
+                        >
+                    </label>
+
+                    <label class="field">
+                        <span class="field__label">Дистанция поездки (км)<span class="field__required">*</span></span>
+                        <input
+                            class="field__input"
+                            type="number"
+                            name="ride_distance"
+                            min="1"
+                            step="0.1"
+                            value="{{ ride_distance }}"
+                            placeholder="Например, 100"
+                            required
+                        >
+                    </label>
+
+                    <label class="field">
+                        <span class="field__label">Допуск по дистанции (км)</span>
+                        <input
+                            class="field__input"
+                            type="number"
+                            name="tolerance"
+                            min="1"
+                            step="0.1"
+                            value="{{ tolerance }}"
+                            placeholder="Оставьте пустым для значения по умолчанию"
+                        >
+                    </label>
+
+                    <button class="button" type="submit">
+                        Найти маршрут
+                        <span class="button__icon">→</span>
+                    </button>
+                </form>
+
+                {% if steps %}
+                    <div class="steps">
+                        <h3>Ход выполнения</h3>
+                        <ul>
+                            {% for item in steps %}
+                                <li>{{ item }}</li>
+                            {% endfor %}
+                        </ul>
+                        <div class="steps__hint">Пожалуйста, подождите — поиск может занять до 30 секунд.</div>
+                    </div>
+                {% endif %}
+            </section>
+
+            <section class="panel panel--result">
+                {% if result %}
+                    <div class="result-card">
+                        <div class="result-card__header">
+                            <h2>{{ result.name }}</h2>
+                            <span class="badge">24/7</span>
+                        </div>
+
+                        <dl class="result-card__details">
+                            <div>
+                                <dt>Бренд</dt>
+                                <dd>{{ result.brand or "Не указано" }}</dd>
+                            </div>
+                            <div>
+                                <dt>Оператор</dt>
+                                <dd>{{ result.operator_name or "Не указано" }}</dd>
+                            </div>
+                            <div>
+                                <dt>Адрес</dt>
+                                <dd>{{ result.address or "Адрес отсутствует в данных" }}</dd>
+                            </div>
+                            <div>
+                                <dt>Координаты</dt>
+                                <dd>{{ "%.6f"|format(result.latitude) }}, {{ "%.6f"|format(result.longitude) }}</dd>
+                            </div>
+                            <div>
+                                <dt>Расстояние по прямой</dt>
+                                <dd>{{ "%.1f"|format(result.distance_km) }} км</dd>
+                            </div>
+                        </dl>
+                    </div>
+                    <div id="map" class="map"></div>
+                {% else %}
+                    <div class="empty-state">
+                        <h2>Найдём маршрут</h2>
+                        <p>Укажите параметры поездки, чтобы предложить подходящую круглосуточную АЗС.</p>
+                    </div>
+                {% endif %}
+            </section>
+        </main>
+    </div>
+
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="loading-overlay__spinner"></div>
+        <div class="loading-overlay__text">Поиск маршрута...</div>
+    </div>
+
+    <script
+        src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+        crossorigin=""
+    ></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+        const resultData = {{ result | tojson | safe }};
+        if (resultData) {
+            window.initializeMap(resultData);
+        }
+    </script>
+</body>
+</html>
+
