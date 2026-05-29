@@ -1,6 +1,27 @@
 (function () {
     const form = document.getElementById("ride-form");
     const overlay = document.getElementById("loading-overlay");
+    const citySelect = document.getElementById("city-select");
+    const cityCustomField = document.getElementById("city-custom-field");
+    const cityCustomInput = document.getElementById("city-custom");
+    const citySelectCustom = citySelect?.dataset.customValue || "custom";
+
+    function syncCityCustomField() {
+        if (!citySelect || !cityCustomField || !cityCustomInput) {
+            return;
+        }
+        const isCustom = citySelect.value === citySelectCustom;
+        cityCustomField.toggleAttribute("hidden", !isCustom);
+        cityCustomInput.required = isCustom;
+        if (!isCustom) {
+            cityCustomInput.setCustomValidity("");
+        }
+    }
+
+    if (citySelect) {
+        citySelect.addEventListener("change", syncCityCustomField);
+        syncCityCustomField();
+    }
 
     if (form && overlay) {
         form.addEventListener("submit", () => {

@@ -53,15 +53,40 @@
 
                     <label class="field">
                         <span class="field__label">Город отправления<span class="field__required">*</span></span>
-                        <input
+                        <select
                             class="field__input"
-                            type="text"
-                            name="city"
-                            value="{{ city }}"
-                            placeholder="Например, Chisinau"
+                            name="city_select"
+                            id="city-select"
+                            data-custom-value="{{ city_select_custom }}"
                             required
                         >
+                            {% for preset in preset_cities %}
+                                <option value="{{ preset }}" {% if city_select == preset %}selected{% endif %}>
+                                    {{ preset }}
+                                </option>
+                            {% endfor %}
+                            <option value="{{ city_select_custom }}" {% if city_select == city_select_custom %}selected{% endif %}>
+                                Другой город…
+                            </option>
+                        </select>
                     </label>
+
+                    <div
+                        class="field field--secondary"
+                        id="city-custom-field"
+                        {% if city_select != city_select_custom %}hidden{% endif %}
+                    >
+                        <label class="field__label field__label--muted" for="city-custom">Свой город</label>
+                        <input
+                            class="field__input field__input--secondary"
+                            type="text"
+                            name="city_custom"
+                            id="city-custom"
+                            value="{{ city_custom }}"
+                            placeholder="Например, Balti"
+                            {% if city_select == city_select_custom %}required{% endif %}
+                        >
+                    </div>
 
                     <label class="field">
                         <span class="field__label">Дистанция поездки (км)<span class="field__required">*</span></span>

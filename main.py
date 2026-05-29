@@ -8,6 +8,22 @@ from flask import Flask, render_template, request
 from fuel_service import GeoLookupError, OverpassError, StationInfo, find_gas_station_for_ride
 
 DEFAULT_CITY = "Chisinau"
+PRESET_CITIES = ("Chisinau", "Orhei")
+CITY_SELECT_CUSTOM = "custom"
+
+
+def resolve_city_from_form(form) -> str:
+    city_select = form.get("city_select", DEFAULT_CITY).strip()
+    city_custom = form.get("city_custom", "").strip()
+    if city_select == CITY_SELECT_CUSTOM:
+        return city_custom
+    return city_select
+
+
+def city_form_state(city: str) -> tuple[str, str]:
+    if city in PRESET_CITIES:
+        return city, ""
+    return CITY_SELECT_CUSTOM, city
 
 
 def parse_float(value: str, field_name: str) -> float:
@@ -44,11 +60,13 @@ def index():
     error: Optional[str] = None
     tolerance_hint: Optional[str] = None
     city = DEFAULT_CITY
+    city_select, city_custom = city_form_state(city)
     ride_distance_input = ""
     tolerance_input = ""
 
     if request.method == "POST":
-        city = request.form.get("city", "").strip()
+        city = resolve_city_from_form(request.form)
+        city_select, city_custom = city_form_state(city)
         ride_distance_input = request.form.get("ride_distance", "").strip()
         tolerance_input = request.form.get("tolerance", "").strip()
 
@@ -67,6 +85,10 @@ def index():
 
     context = {
         "city": city,
+        "city_select": city_select,
+        "city_custom": city_custom,
+        "preset_cities": PRESET_CITIES,
+        "city_select_custom": CITY_SELECT_CUSTOM,
         "ride_distance": ride_distance_input,
         "tolerance": tolerance_input,
         "result": asdict(result) if result else None,

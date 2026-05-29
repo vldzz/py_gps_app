@@ -100,6 +100,10 @@ body {
     gap: 8px;
 }
 
+.field[hidden] {
+    display: none !important;
+}
+
 .field__label {
     font-size: 0.95rem;
     font-weight: 600;
@@ -124,6 +128,28 @@ body {
     outline: none;
     border-color: var(--accent-color);
     box-shadow: 0 0 0 3px var(--accent-color-light);
+}
+
+select.field__input {
+    cursor: pointer;
+}
+
+.field--secondary {
+    margin-top: -8px;
+    padding-left: 12px;
+    border-left: 2px solid rgba(88, 166, 255, 0.2);
+}
+
+.field__label--muted {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-muted);
+}
+
+.field__input--secondary {
+    font-size: 0.95rem;
+    padding: 12px 14px;
+    border-color: rgba(88, 166, 255, 0.15);
 }
 
 .button {
