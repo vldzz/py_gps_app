@@ -7,6 +7,8 @@ from flask import Flask, render_template, request
 
 from fuel_service import GeoLookupError, OverpassError, StationInfo, find_gas_station_for_ride
 
+DEFAULT_CITY = "Chisinau"
+
 
 def parse_float(value: str, field_name: str) -> float:
     message = f"Некорректное значение поля \"{field_name}\". Введите положительное число."
@@ -41,7 +43,7 @@ def index():
     steps = []
     error: Optional[str] = None
     tolerance_hint: Optional[str] = None
-    city = ""
+    city = DEFAULT_CITY
     ride_distance_input = ""
     tolerance_input = ""
 

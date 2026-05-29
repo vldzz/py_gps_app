@@ -10,7 +10,7 @@ import requests
 
 NOMINATIM_URL = "https://nominatim.openstreetmap.org/search"
 OVERPASS_URL = "https://overpass-api.de/api/interpreter"
-USER_AGENT = "NightRideFuelFinder/1.0 (https://example.com/contact)"
+USER_AGENT = "NightRideFuelFinder/1.0 (https://py-gps-app.vercel.app/)"
 
 
 class GeoLookupError(Exception):
@@ -35,7 +35,10 @@ class StationInfo:
 
 def get_city_coordinates(city_name: str) -> Tuple[float, float]:
     """Возвращает координаты (широта, долгота) для указанного города."""
-    headers = {"User-Agent": USER_AGENT}
+    headers = {
+        "User-Agent": USER_AGENT,
+        "Accept": "application/json",
+    }
     params = {"q": city_name, "format": "json", "limit": 1}
 
     try:
@@ -70,7 +73,10 @@ def build_overpass_query(lat: float, lon: float, radius_km: float) -> str:
 
 def fetch_open_247_gas_stations(lat: float, lon: float, radius_km: float) -> List[Dict[str, Any]]:
     """Запрашивает список круглосуточных АЗС в заданном радиусе."""
-    headers = {"User-Agent": USER_AGENT}
+    headers = {
+        "User-Agent": USER_AGENT,
+        "Accept": "application/json",
+    }
     payload = {"data": build_overpass_query(lat, lon, radius_km)}
 
     try:
